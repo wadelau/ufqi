@@ -1,7 +1,6 @@
 //- relocate from footer.html, 11:30 2020-12-04
 
 //-
-var viewdir = '{$viewdir}';
 if (false && 'serviceWorker' in navigator && 'PushManager' in window) {
 	navigator.serviceWorker
 	 .register(viewdir+'/scripts/service-worker.js')
@@ -144,7 +143,7 @@ if(true){
 						if(tmpArr[0].length > 2){
 						tmpArr[0] = tmpArr[0].substring(0, 2);
 						}
-						selfList += '<a href="{$url}&mod=clsc&pnskwordid={$wordId},'+tmpArr[1]+'" '
+						selfList += '<a href="'+theUrl+'&mod=clsc&pnskwordid='+wordId+','+tmpArr[1]+'" '
 							+' onclick="CS.set(\'userkwclsc\', \''+$j+'\');"'
 							+' class="bdkw">+'+tmpArr[0]+'</a> '; 
 						dispCount++;
@@ -183,7 +182,7 @@ function addBookMark() {
 	}
 	else{
 		console.log("unsupported terminal? "+navigator.userAgent.toLowerCase());		
-		window.location.href = "{$url}&mod=rdr&act=add2desktop";
+		window.location.href = theUrl+"&mod=rdr&act=add2desktop";
 	}
 }
 
@@ -240,7 +239,7 @@ function resizeWindow(){
 				document.body.style.width =  '768px' ;
 				var myelm = document.createElement("div");
 				myelm.setAttribute('id', 'ufqinews_qrcode');
-				var qrcodecont = '&nbsp;<img src="{$rtvdir}/view/clsc/images/ufqilong-qrcode.202002.gif"'
+				var qrcodecont = '&nbsp;<img src="'+viewdir+'/images/ufqiclsc-qrcode.202002.gif"'
 					+' alt="ufqiClsc qrcode"/><br/>&nbsp;<span style="font-size:11px;">扫码到手机看</span><br/><p>&nbsp;</p>';
 				myelm.innerHTML = qrcodecont;
 				document.getElementById('maindiv').appendChild(myelm);

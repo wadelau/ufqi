@@ -1,7 +1,6 @@
 //- relocate from footer.html, 11:14 2020-12-04
 
 //-
-var viewdir = '{$viewdir}';
 // TODO add service worker code here
 if (false && 'serviceWorker' in navigator && 'PushManager' in window) {
 	navigator.serviceWorker
@@ -145,7 +144,7 @@ if(true){
 						if(tmpArr[0].length > 2){
 						tmpArr[0] = tmpArr[0].substring(0, 2);
 						}
-						selfList += '<a href="{$url}&mod=ulong&pnskwordid={$wordId},'+tmpArr[1]+'" '
+						selfList += '<a href="'+theUrl+'&mod=ulong&pnskwordid='+wordId+','+tmpArr[1]+'" '
 							+' onclick="CS.set(\'userkwulong\', \''+$j+'\');"'
 							+' class="bdkw">+'+tmpArr[0]+'</a> '; 
 						dispCount++;
@@ -184,7 +183,7 @@ function addBookMark() {
 	}
 	else{
 		console.log("unsupported terminal? "+navigator.userAgent.toLowerCase());		
-		window.location.href = "{$url}&mod=rdr&act=add2desktop";
+		window.location.href = theUrl+"&mod=rdr&act=add2desktop";
 	}
 }
 
@@ -242,7 +241,7 @@ function resizeWindow(){
 				document.body.style.width =  '768px' ;
 				var myelm = document.createElement("div");
 				myelm.setAttribute('id', 'ufqinews_qrcode');
-				var qrcodecont = '<br/>&nbsp;<img src="{$rtvdir}/view/ulong/images/ufqilong-qrcode.202002.gif"'
+				var qrcodecont = '<br/>&nbsp;<img src="'+viewdir+'/images/ufqilong-qrcode.202002.gif"'
 					+' alt="ufqinews qrcode"/><br/>&nbsp;<span style="font-size:11px;">扫码到手机看</span><br/><p>&nbsp;</p>';
 				myelm.innerHTML = qrcodecont;
 				document.getElementById('maindiv').appendChild(myelm);
