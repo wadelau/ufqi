@@ -11,6 +11,7 @@ apiready = function(){
 	console.log(msg=(new Date())+" apiready: viewdir:"+viewdir+", devid:"+api.deviceId);
 	//window.alert("msg:"+msg);
 }
+
 //-
 function openLocalWin(myUrl, myTitle){
 	if(true && typeof api != 'undefined'){
@@ -232,17 +233,17 @@ function resizeWindow(){
 				ypos = win.innerHeight|| elm.clientHeight|| gbo.clientHeight;
 			//document.getElementById('maindiv').style.height = (ypos-56) +'px';
 			if(xpos > 768){ // - desktop
-				console.log(xpos + ' × ' + ypos+' resized to 768px.');
+				console.log(xpos + ' 脳 ' + ypos+' resized to 768px.');
 				document.body.style.width =  '768px' ;
 				var myelm = document.createElement("div");
 				myelm.setAttribute('id', 'ufqinews_qrcode');
 				var qrcodecont = '&nbsp;<img src="{$rtvdir}/view/default/images/ufqinews-qrcode.201903.png"'
-					+' alt="ufqinews qrcode"/><br/>&nbsp;<span style="font-size:11px;">扫码到手机看</span><br/><p>&nbsp;</p>';
+					+' alt="ufqinews qrcode"/><br/>&nbsp;<span style="font-size:11px;">鎵爜鍒版墜鏈虹湅</span><br/><p>&nbsp;</p>';
 				myelm.innerHTML = qrcodecont;
 				document.getElementById('maindiv').appendChild(myelm);
 			}
 			else{
-				console.log(xpos + ' × ' + ypos+' is less than 768px.'); 
+				console.log(xpos + ' 脳 ' + ypos+' is less than 768px.'); 
 			}
 		}
 	}, 1*1000);
