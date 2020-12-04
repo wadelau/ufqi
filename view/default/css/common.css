@@ -1,0 +1,48 @@
+
+body {
+	padding: 0px;
+	margin: 0px auto;
+	max-width: 768px;
+	background-color: #f5f5f7;
+}
+
+a {
+	color: #3951b3;
+}
+
+hr {
+	margin: 0 0;
+}
+
+li {
+	margin-bottom: 12px;
+}
+
+select {
+	max-width: 95%;
+}
+
+img {
+	border-radius: 10px;
+}
+
+/* */
+.smallinput {
+	max-width:32%;
+}
+
+.reminder {
+	font-size: 12px;
+	color: red;
+	top: -10px;
+	left: -5px;
+	font-weight: bolder;
+}
+
+.small {
+	font-size: small; /* even smaller */
+}
+
+.smaller {
+	font-size: smaller;
+}
