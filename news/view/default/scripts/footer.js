@@ -1,3 +1,55 @@
+
+var viewdir = '{$viewdir}';
+// TODO add service worker code here
+if (false && 'serviceWorker' in navigator && 'PushManager' in window) {
+	navigator.serviceWorker
+	 .register(viewdir+'/scripts/service-worker.js')
+	 .then(function() { console.log('Service Worker Registered'); })
+	 .catch(function(error) { console.error('Service Worker Error', error);});
+}
+apiready = function(){
+	console.log(msg=(new Date())+" apiready: viewdir:"+viewdir+", devid:"+api.deviceId);
+	//window.alert("msg:"+msg);
+}
+//-
+function openLocalWin(myUrl, myTitle){
+	if(true && typeof api != 'undefined'){
+		//window.alert("api:"+api+" url:"+myUrl+" marginH:"+marginH);
+		api.openWin({
+			name: 'readWindowServer',
+			//url: 'fs://./index3.html?url='+myUrl+'&tit='+myTitle,
+			url: myUrl, 
+			scrollEnabled: true,
+			vScrollBarEnabled: true,
+			reload: true,
+			/*
+			rect: { 
+				marginTop: 35, 
+				marginBottom: 0, 
+				w: 'auto', 
+				h: 'auto'
+				},
+			*/
+			});
+	}
+	else{
+		var timeToWait = window.setTimeout(function(){
+				var isMObj = document.getElementById('isMobile');
+				var isMObjVal = 0;
+				if(isMObj){ isMObjVal = isMObj.innerText; }
+				if(isMObjVal==1){
+					document.location.href = myUrl;
+				}
+				else{
+					window.open(myUrl, '_blank');
+				}
+			}, 10); //- 0.01 sec
+		//console.log("news open by click.....myUrl:"+myUrl);
+	}
+	event.preventDefault();
+	return false;
+}
+
 //- relocate from footer.html, 10:36 2020-12-04
 var StaticClientStorage = function(){
 	var hasLocalStorage = false;
