@@ -245,7 +245,7 @@ function resizeWindow(){
 				document.getElementById('maindiv').appendChild(myelm);
 			}
 			else{
-				console.log(xpos + ' × ' + ypos+' is less than 768px.');
+				//console.log(xpos + ' × ' + ypos+' is less than 768px.');
 			}
 		}
 	}, 1*1000);

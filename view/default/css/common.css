@@ -46,3 +46,7 @@ img {
 .smaller {
 	font-size: smaller;
 }
+
+.main_box {
+	letter-spacing: 1px;
+}

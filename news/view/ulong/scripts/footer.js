@@ -237,7 +237,7 @@ function resizeWindow(){
 				ypos = win.innerHeight|| elm.clientHeight|| gbo.clientHeight;
 			//document.getElementById('maindiv').style.height = (ypos-56) +'px';
 			if(xpos > 768){ // - desktop
-				console.log(xpos + ' × ' + ypos+' resized to 768px.');
+				//console.log(xpos + ' × ' + ypos+' resized to 768px.');
 				document.body.style.width =  '768px' ;
 				var myelm = document.createElement("div");
 				myelm.setAttribute('id', 'ufqinews_qrcode');
@@ -247,7 +247,7 @@ function resizeWindow(){
 				document.getElementById('maindiv').appendChild(myelm);
 			}
 			else{
-				console.log(xpos + ' × ' + ypos+' is less than 768px.');
+				//console.log(xpos + ' × ' + ypos+' is less than 768px.');
 			}
 		}
 	}, 1*1000);
@@ -256,10 +256,10 @@ if('{$mod}'!='intro' && '{$ref}'!='introiframe'){
 	if(window.addEventListener){
 		//window.addEventListener('load', resizeWindow); // in case of load failed....
 		window.addEventListener('load', function(){ resizeWindow(); });
-		console.log("resize attached. ulong");
+		//console.log("resize attached. ulong");
 	}
 	else{
 		resizeWindow();	
-		console.log("resize launched.");
+		//console.log("resize launched.");
 	}
 }
