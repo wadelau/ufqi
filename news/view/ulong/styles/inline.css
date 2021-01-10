@@ -50,6 +50,10 @@ body {
 img {
 	border-radius: 10px; }
 
+a:hover {
+	text-underline-offset:4px;
+}
+
 a.whitea{
 	color:white;	
 }

@@ -25,6 +25,7 @@ a:active {
 a:hover {
 	color:#ff0000;
 	text-decoration:underline;
+	text-underline-offset:4px;
 }
 div#content{
 	/* width:960px; */
