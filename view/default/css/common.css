@@ -9,6 +9,9 @@ body {
 a {
 	color: #3951b3;
 }
+a:hover {
+	text-underline-offset: 4px;
+}
 
 hr {
 	margin: 0 0;
