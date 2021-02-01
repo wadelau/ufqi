@@ -56,7 +56,7 @@ function getRandAdv($advList){
 //- visual gradient for adv.
 function tinyGradient(myObj){
 	var sizeChange = 1.5; var gradientStep = 0.15;
-	var myMax = 100; var mySizeMin = 95; var mySizeMax = 155;
+	var myMax = 100; var mySizeMin = 100; var mySizeMax = 165;
 	if(myObj){
 		var mySize = myObj.height;
 		var tmpRandi = Math.floor(Math.random() * Math.floor(myMax));
@@ -65,8 +65,8 @@ function tinyGradient(myObj){
 		}
 		if(tmpRandi % 2 == 0){ mySize = mySize + sizeChange; }
 		else{ mySize = mySize - sizeChange; }
-		if(mySize < mySizeMin){ mySize = mySizeMin; }
-		else if(mySize > mySizeMax){ mySize = mySizeMax; }
+		if(mySize <= mySizeMin){ mySize = mySizeMin + sizeChange; }
+		else if(mySize => mySizeMax){ mySize = mySizeMax - sizeChange; }
 		
 		var oldV = myObj.style.opacity;
 		oldV = oldV=='' ? (Math.random()) : oldV;
