@@ -55,21 +55,22 @@ function getRandAdv($advList){
 }
 //- visual gradient for adv.
 function tinyGradient(myObj){
-	var sizeChange = 1.5; var gradientStep = 0.15;
-	var myMax = 100; var mySizeMin = 100; var mySizeMax = 175;
+	var sizeChange = 1; //- min value: 1px
+	var gradientStep = 0.15; var myMax = 100; 
+	var mySizeMin = 110; var mySizeMax = 178; //- same as css
 	if(myObj){
 		var mySize = myObj.height;
 		var tmpRandi = Math.floor(Math.random() * Math.floor(myMax));
 		if(tmpRandi == lastRandImgi){
 			tmpRandi = Math.floor(Math.random() * Math.floor(myMax));
 		}
-		if(tmpRandi % 2 == 0){ mySize = mySize + sizeChange; }
-		else{ mySize = mySize - sizeChange; }
-		if(mySize <= mySizeMin){ mySize = mySizeMin + (sizeChange * 3); }
-		else if(mySize => mySizeMax){ mySize = mySizeMax - (sizeChange * 3); }
+		if((tmpRandi % 2) == 1){ mySize = mySize - sizeChange; }
+		else{ mySize = mySize + (sizeChange*2); }
+		if(mySize <= mySizeMin){ mySize = mySizeMin*3/2; }
+		else if(mySize >= mySizeMax){ mySize = mySizeMax*2/3; }
 		
 		var oldV = myObj.style.opacity;
-		oldV = oldV=='' ? (Math.random()) : oldV;
+		oldV = (oldV=='') ? (Math.random()) : oldV;
 		oldV = parseFloat(oldV);
 		if(typeof oldV == 'undefined' || typeof oldV == undefined || isNaN(oldV)){
 			oldV = 0.1;
@@ -80,7 +81,7 @@ function tinyGradient(myObj){
 		else{ oldV += gradientStep; }
 		lastRandImgi = tmpRandi;
 		
-		//console.log('tmpRandi:'+tmpRandi+' mySize:'+mySize+' 22 oldV:'+oldV);
+		//console.log('tmpRandi:'+tmpRandi+' mySize:'+mySize+' oldV:'+oldV+' 109');
 		myObj.height = mySize;
 		myObj.style.opacity = oldV;
 	}
