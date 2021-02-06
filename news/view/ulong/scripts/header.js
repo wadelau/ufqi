@@ -75,7 +75,7 @@ function tinyGradient(myObj){
 		if(typeof oldV == 'undefined' || typeof oldV == undefined || isNaN(oldV)){
 			oldV = 0.1;
 		}
-		else if(oldV >= 1.0){
+		else if(oldV >= 1.4){
 			if(tmpRandi % 3 != 0){ oldV = 0.1; }else{ oldV = Math.random(); }
 		}
 		else{ oldV += gradientStep; }

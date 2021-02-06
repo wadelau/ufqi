@@ -200,3 +200,8 @@ a.whitea{
 	overflow-x:hidden; overflow-y:hidden; 
 	max-width:768px; min-width:766px;
 }
+
+.thePageUrl {
+	border:0px;  max-width:92%;
+	width:75%; background-color:transparent;
+}
