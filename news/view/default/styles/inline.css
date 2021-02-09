@@ -46,11 +46,15 @@ body {
 
 img {
 	border-radius: 10px; }
-
+a {
+	letter-spacing: 1px;
+	text-decoration:none;	
+	/* color:#3f5158; */
+	color: #06c;
+}
 a:hover {
 	text-underline-offset: 4px;
 }
-	
 a.whitea{
 	color:white;	
 }

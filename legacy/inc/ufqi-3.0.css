@@ -11,8 +11,10 @@ body{
 	word-break: break-word;
 }
 a:link {
-	color:#000099;
+	/* color:#000099; */
+	color: #06c;
 	text-decoration:none;
+	letter-spacing: 1px;
 }
 a:visited {
 	color:#000099;

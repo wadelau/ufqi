@@ -7,7 +7,10 @@ body {
 }
 
 a {
-	color: #3951b3;
+	/* color: #3951b3; */
+	color: #06c;
+	text-decoration: none;
+	letter-spacing: 1px;
 }
 a:hover {
 	text-underline-offset: 4px;
