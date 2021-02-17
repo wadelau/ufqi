@@ -59,7 +59,8 @@ a:hover {
 	text-underline-offset:4px;
 }
 a.whitea{
-	color:white;	
+	color:white;
+	letter-spacing: 0px;
 }
 
 .header {

@@ -10,10 +10,11 @@ function getRandImgI(myMax){
 		myMax = maxdefimgi + 1;
 	}
 	var randimgi = Math.floor(Math.random() * Math.floor(myMax));
+	var lastRandImgi = window.lastRandImgi;
 	if(randimgi == lastRandImgi){ 
 		randimgi = Math.floor(Math.random() * Math.floor(myMax)); 
 	}
-	lastRandImgi = randimgi;
+	window.lastRandImgi = randimgi;
 	return randimgi;
 }
 //-
@@ -47,10 +48,11 @@ if(typeof lastRandImgi == 'undefined' || typeof lastRandImgi == undefined){ wind
 function getRandAdv($advList){
 	var advListLen = $advList.length;
 	var tmpRandi = Math.floor(Math.random() * Math.floor(advListLen));
+	var lastRandImgi = window.lastRandImgi;
 	if(tmpRandi == lastRandImgi){
 		tmpRandi = Math.floor(Math.random() * Math.floor(advListLen));
-		lastRandImgi = tmpRandi;
 	}
+	window.lastRandImgi = tmpRandi;
 	return $advList[tmpRandi];
 }
 //- visual gradient for adv.
@@ -61,6 +63,7 @@ function tinyGradient(myObj){
 	if(myObj){
 		var mySize = myObj.height;
 		var tmpRandi = Math.floor(Math.random() * Math.floor(myMax));
+		var lastRandImgi = window.lastRandImgi;
 		if(tmpRandi == lastRandImgi){
 			tmpRandi = Math.floor(Math.random() * Math.floor(myMax));
 		}
@@ -79,7 +82,7 @@ function tinyGradient(myObj){
 			if(tmpRandi % 3 != 0){ oldV = 0.1; }else{ oldV = Math.random(); }
 		}
 		else{ oldV += gradientStep; }
-		lastRandImgi = tmpRandi;
+		window.lastRandImgi = tmpRandi;
 		
 		//console.log('tmpRandi:'+tmpRandi+' mySize:'+mySize+' oldV:'+oldV+' 109');
 		myObj.height = mySize;
