@@ -2,6 +2,22 @@
  * header.js for global functions and tools
  * since 13:58 2021-01-29
  */
+
+//- get objects
+function _getElement(idName){
+	var obj = document.getElementById(idName);
+	if(obj){
+		return obj;
+	}
+	else{
+		var objs = document.getElementsByName(idName);
+		if(objs){
+			return objs[0];
+		}
+	}
+	return null;
+} 
+ 
 //- imgs and advs
 var lastRandImgi = 0; var maxdefimgi = 7;
 //-	

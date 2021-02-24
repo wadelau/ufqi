@@ -1,5 +1,69 @@
 //- relocate from footer.html, 11:14 2020-12-04
 
+//- comments, 10:18 2021-02-24
+function call2Comment(winTag, sId){
+	if(typeof sId == 'undefined'){ sId = ''; }
+	var cmtListAreaId = 'commentArea'; var myDataAct = 'data-act';
+	var pubAreaId = 'commentArea4Publish'; var pubIframeId = 'callComment';
+	winTag = winTag=='' ? 0 : winTag; winTag = parseInt(winTag);
+	if(winTag == 0 || winTag == 3){
+		//- open to make a new comment or reply
+		var comment4Pub = document.getElementById(pubAreaId);
+		if(comment4Pub){
+			comment4Pub.style.display = 'inline-block';
+			comment4Pub.style.height = '260px';
+			var tmpIframe = document.getElementById(pubIframeId);
+			if(tmpIframe){
+				tmpIframe.style.height = '255px';
+				var thisHref = document.getElementById(sId);
+				if(thisHref){
+					tmpIframe.src = thisHref.getAttribute(myDataAct);
+				}
+			}
+			var commentList = document.getElementById(cmtListAreaId);
+			if(commentList){
+				commentList.style.display = 'none';
+				commentList.style.height = 0;
+				commentList.style.opacity = 0;
+			}
+		}
+	}
+	else if(winTag == 1){
+		//- close and return
+		var comment4Pub = document.getElementById(pubAreaId);
+		if(comment4Pub){
+			comment4Pub.style.display = 'none';
+			comment4Pub.style.height = 0;
+			var tmpIframe = document.getElementById(pubIframeId);
+			if(tmpIframe){
+				tmpIframe.style.height = 0;
+			}
+		}
+		var commentList = document.getElementById(cmtListAreaId);
+		if(commentList){
+			commentList.style.display = 'inline-block';
+			commentList.style.height = 'auto';
+			commentList.style.opacity = 1.0;
+		}
+	}
+	else if(winTag == 2 || winTag == -1){
+		//- upvote or downvote
+		var thisHref = document.getElementById(sId);
+		if(thisHref){
+			var actStr = thisHref.getAttribute(myDataAct);
+			var tmpIframe = document.getElementById(pubIframeId);
+			if(tmpIframe){
+				tmpIframe.src = actStr;
+				window.alert((new Date())+':\n感谢评议!')
+			}
+		}
+	}
+	else{
+		console.log("call2Comment: winTag:"+winTag+" not found. "+(new Date()));
+	}
+	return true;
+}
+
 //-
 // TODO add service worker code here
 if (false && 'serviceWorker' in navigator && 'PushManager' in window) {

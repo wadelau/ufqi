@@ -10,4 +10,5 @@ function _getElement(idName){
 			return objs[0];
 		}
 	}
+	return null;
 }
