@@ -54,7 +54,8 @@ function call2Comment(winTag, sId){
 			var tmpIframe = document.getElementById(pubIframeId);
 			if(tmpIframe){
 				tmpIframe.src = actStr;
-				window.alert((new Date())+':\n感谢评议!')
+				var tmpTag = winTag>0 ? '👍' : '	👎';
+				window.alert((new Date())+':\n'+tmpTag+'感谢评议!');
 			}
 		}
 	}
@@ -303,7 +304,7 @@ function resizeWindow(){
 				document.body.style.width =  '768px' ;
 				var myelm = document.createElement("div");
 				myelm.setAttribute('id', 'ufqinews_qrcode');
-				var qrcodecont = '&nbsp;<img src="'+viewdir+'/images/ufqiclsc-qrcode.202002.gif"'
+				var qrcodecont = '&nbsp;<img src="'+viewdir+'/images/ufqiclsc-qrcode.png"'
 					+' alt="ufqiClsc qrcode"/><br/>&nbsp;<span style="font-size:11px;">扫码到手机看</span><br/><p>&nbsp;</p>';
 				myelm.innerHTML = qrcodecont;
 				document.getElementById('maindiv').appendChild(myelm);

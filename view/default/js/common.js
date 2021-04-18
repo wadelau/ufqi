@@ -4,11 +4,25 @@ if(true){
 	if(ua.indexOf('mobile') > 0){ isMobile=true; }
 }
 //-
+function _getElement(idName){
+	var obj = document.getElementById(idName);
+	if(obj){
+		return obj;
+	}
+	else{
+		var objs = document.getElementsByName(idName);
+		if(objs){
+			return objs[0];
+		}
+	}
+	return null;
+}
+//-
 function numFormat(myNum){
 	myNum = '' + myNum;
 	var dotPos = myNum.indexOf('.');
 	if(dotPos > -1){ myNum = myNum.substring(0, dotPos+3); }
-	return parseFloat(myNum);
+	return parseFloat(myNum).toFixed(1);
 }
 //-
 function showAddress(codeList, addrCode){

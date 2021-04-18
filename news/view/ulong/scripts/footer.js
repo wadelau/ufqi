@@ -54,7 +54,8 @@ function call2Comment(winTag, sId){
 			var tmpIframe = document.getElementById(pubIframeId);
 			if(tmpIframe){
 				tmpIframe.src = actStr;
-				window.alert((new Date())+':\n感谢评议!')
+				var tmpTag = winTag>0 ? '👍' : '	👎';
+				window.alert((new Date())+':\n'+tmpTag+'感谢评议!');
 			}
 		}
 	}
