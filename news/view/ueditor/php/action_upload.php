@@ -6,6 +6,7 @@
  * Time: 上午10:17
  */
 include "Uploader.class.php";
+include "../../../mod/WaterMark.class.php";
 
 /* 上传配置 */
 $base64 = "upload";

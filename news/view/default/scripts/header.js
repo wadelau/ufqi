@@ -6,16 +6,20 @@
 //- get objects
 function _getElement(idName){
 	var obj = document.getElementById(idName);
-	if(obj){
-		return obj;
+	var myObj = new Object();
+	if(obj != null && typeof obj != 'undefined'){
+		myObj = obj;
 	}
 	else{
 		var objs = document.getElementsByName(idName);
-		if(objs){
-			return objs[0];
+		if(objs != null && typeof objs != 'undefined'){
+			if(objs[0] != null && typeof objs[0] != 'undefined'){
+				myObj = objs[0];
+			}
 		}
 	}
-	return null;
+	//console.log("comm/ido: _g idName:"+idName+" myObj:"+JSON.stringify(myObj));
+	return myObj;
 } 
  
 //- imgs and advs

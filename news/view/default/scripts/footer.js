@@ -252,21 +252,27 @@ function addBookMark() {
 	}
 }
 
+//-
+var passiveIfSupported = false;
+try{
+	window.addEventListener("test", null, Object.defineProperty({}, "passive", { get: function() { passiveIfSupported = { passive: true }; } }));
+} catch(err) {}
+
 //- auto scroll into next page
 if(typeof autoScrollDivObj != 'undefined'){
 	autoScrollDivObj.onscroll = runOnScroll;	
-	autoScrollDivObj.addEventListener("scroll", runOnScroll);	
-	autoScrollDivObj.addEventListener("onscroll", runOnScroll);	
-	autoScrollDivObj.addEventListener("touchend", runOnScroll, false);	
-	autoScrollDivObj.addEventListener("dragleave", runOnScroll, false);	
-	autoScrollDivObj.addEventListener("dragend", runOnScroll, false);	
-	autoScrollDivObj.addEventListener("drop", runOnScroll);	
+	autoScrollDivObj.addEventListener("scroll", runOnScroll, passiveIfSupported);	
+	autoScrollDivObj.addEventListener("onscroll", runOnScroll, passiveIfSupported);	
+	autoScrollDivObj.addEventListener("touchend", runOnScroll, passiveIfSupported);	
+	autoScrollDivObj.addEventListener("dragleave", runOnScroll, passiveIfSupported);	
+	autoScrollDivObj.addEventListener("dragend", runOnScroll, passiveIfSupported);	
+	autoScrollDivObj.addEventListener("drop", runOnScroll, passiveIfSupported);	
 	autoScrollDivObj.ondrop = runOnScroll
 	//autoScrollDivObj.addEventListener("mouseup", runOnScroll);	
 	//autoScrollDivObj.addEventListener("keyup", runOnScroll);	
 	autoScrollDivObj.onwheel = runOnScroll;
-	autoScrollDivObj.addEventListener("wheel", runOnScroll);	
-	autoScrollDivObj.addEventListener("onwheel", runOnScroll, false);	
+	autoScrollDivObj.addEventListener("wheel", runOnScroll, passiveIfSupported);	
+	autoScrollDivObj.addEventListener("onwheel", runOnScroll, passiveIfSupported);	
 }
 
 //- manully append preload (not in head) with script with firefox

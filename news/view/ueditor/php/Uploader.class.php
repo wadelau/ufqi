@@ -122,6 +122,10 @@ class Uploader
             $this->stateInfo = $this->getStateInfo("ERROR_FILE_MOVE");
         } else { //移动成功
             $this->stateInfo = $this->stateMap[0];
+			# add watermark? Fri May 28 04:54:24 UTC 2021
+			$finalRealFile = $this->filePath;
+			$waterMark = new WaterMark($finalRealFile);
+			$waterMark->addString($_CONFIG['watermark_for_upload_image']);
         }
     }
 

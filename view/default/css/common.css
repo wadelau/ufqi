@@ -14,6 +14,7 @@ a {
 }
 a:hover {
 	text-underline-offset: 4px;
+	font-weight:bolder;
 }
 
 hr {
@@ -34,7 +35,7 @@ img {
 
 /* */
 .smallinput {
-	max-width:32%;
+	max-width:30%;
 }
 
 .reminder {

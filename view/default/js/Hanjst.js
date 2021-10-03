@@ -38,6 +38,14 @@ if(window.Hanjst){
 	}
 }
 window.Hanjst = window.HanjstDefault;
+/*
+window.addEventListener('error', (errorEvent) => {
+	const { lineno, colno } = errorEvent;
+	console.log(`Error thrown at: ${lineno}:${colno}`);
+	// Don't pollute the console with additional info:
+	errorEvent.preventDefault();
+});
+*/
 //- ----------------- MAGIC START -----------------
 (function(window){ //- anonymous Hanjst main func bgn
 
@@ -510,8 +518,10 @@ window.Hanjst = window.HanjstDefault;
         }
         catch(e1200){
 			var tmpStr = JSON.stringify(e1200, Object.getOwnPropertyNames(e1200)); 
-			console.log(tmpStr);
-			if(isDebug){ window.alert((new Date())+':\n'+tmpStr); }
+			console.log(tmpStr); console.log(logTag + "tpl2code: "+tpl2code);
+			//- use Firefox to figure out exact error lineNumber and columnNumber in tpl2code
+			//- comment by xenxin@ufqi.com, Tue Jun 29 13:49:23 UTC 2021
+			if(isDebug){ window.alert((new Date())+':\n'+tmpStr+'\nUse Firefox to figure out lines detail in tpl2code.'); }
         }
 		Hanjst.tplObject.innerHTML = tplParse;
 		//- release objects		

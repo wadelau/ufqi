@@ -28,6 +28,7 @@ a:hover {
 	color:#ff0000;
 	text-decoration:underline;
 	text-underline-offset:4px;
+	font-weight:bolder;
 }
 div#content{
 	/* width:960px; */
