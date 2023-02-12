@@ -161,7 +161,19 @@ var StaticClientStorage = function(){
 				tmpjson[$val] = $oldc;
 				var $finalval = JSON.stringify(tmpjson);
 			}
-			window.localStorage.setItem($key, $finalval);
+			//window.localStorage.setItem($key, $finalval);
+			try{
+				window.localStorage.setItem($key, $finalval);
+			}
+			catch(e202201151544){
+				//- detect large unused Object for localStorage quotes
+				var tmpk = '';
+				for ( var i = 0, len = localStorage.length; i < len; ++i ) {
+				  tmpk = localStorage.key(i);
+				  console.log( "\trmvd-i:"+i+" k:["+tmpk+"] v:"+ localStorage.getItem(tmpk));
+				  if(tmpk != null && tmpk.indexOf('st_shares') > -1){ window.localStorage.removeItem(tmpk); } // large unused Object
+				}
+			}
 			//console.log("localstorage set: key:"+$key+" val:"+$val+" fval:"+$finalval+".");	
 		}
 		else{
@@ -206,7 +218,7 @@ if(true){
 						//- same kw
 					}
 					else{
-						if(tmpArr[0].length > 2){
+						if(false && tmpArr[0].length > 2){
 						tmpArr[0] = tmpArr[0].substring(0, 2);
 						}
 						selfList += '<a href="'+theUrl+'&pnskwordid='+wordId+','+tmpArr[1]+'" '
@@ -318,6 +330,29 @@ function resizeWindow(){
 				//console.log(xpos + ' × ' + ypos+' is less than 768px.'); 
 			}
 		}
+		//- anti cache link for logo, need rm same in footer.html
+		if(true){
+			var logoLink = _getElement("logoLink");
+			if(logoLink){
+				var clientRdi = parseInt(Math.random()*100000);
+				var currentHref = logoLink.href;
+				var currentHrefPos = currentHref.indexOf('clientRdi=');
+				if( currentHrefPos > -1){
+					currentHref = currentHref.substring(0, currentHrefPos);
+					currentHref += "clientRdi="+clientRdi;
+				}
+				else{
+					if(currentHref.indexOf('?') > -1){
+						currentHref += "&";
+					}
+					else{
+						currentHref += "?";
+					}
+					currentHref += "clientRdi="+clientRdi;
+				}
+				logoLink.href = currentHref;
+			}
+		}
 	}, 1*1000);
 }
 if('{$mod}'!='intro' && '{$ref}'!='introiframe'){
@@ -335,3 +370,4 @@ if('{$mod}'!='intro' && '{$ref}'!='introiframe'){
 		//console.log("resize launched.");
 	}
 }
+

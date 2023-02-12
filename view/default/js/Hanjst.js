@@ -1,15 +1,15 @@
 //-
 //- Hanjst
-//- 汉吉斯特
+//- 汉吉斯特 Han Ji Si Te
 /* 
  * Han JavaScript Template Engine
  * --- The template semantic, syntax and its engine ---
  * 基于JavaScript通用HTML页面模板语言及其解析引擎
  * @Born with GWA2， General Web Application Architecture
- * @Xenxin@ufqi.com, Wadelau@hotmail.com
+ * @ Xenxin@ufqi.com, Wadelau@hotmail.com, Wadelau@gmail.com
  * @Since July 07, 2016, refactor on Oct 10, 2018
  * @More at the page footer.
- * @Ver 2.1
+ * @Ver 2.7
  */
 
 "use strict"; //- we are serious
@@ -38,14 +38,7 @@ if(window.Hanjst){
 	}
 }
 window.Hanjst = window.HanjstDefault;
-/*
-window.addEventListener('error', (errorEvent) => {
-	const { lineno, colno } = errorEvent;
-	console.log(`Error thrown at: ${lineno}:${colno}`);
-	// Don't pollute the console with additional info:
-	errorEvent.preventDefault();
-});
-*/
+  
 //- ----------------- MAGIC START -----------------
 (function(window){ //- anonymous Hanjst main func bgn
 
@@ -99,9 +92,11 @@ window.addEventListener('error', (errorEvent) => {
 		else{
 			console.log(logTag+'pageJsonElement:['+jsonDataId+'] has error. 201812010927'); 
 		}
-	} //- end of pageJsonElement
+	} 
+	//- end of pageJsonElement
+	
 	//- handle server response in json,
-	//- parse it into global variables starting with this tplVarTag, ie, $ as the default.
+	//- parse it into global variables starting with this tplVarTag, i.e., $ as the default.
 	if(tplData){
 		if(!tplData['copyright_year']){ tplData['copyright_year'] = myDate.getFullYear(); }
 		if(!tplData['time_stamp']){ tplData['time_stamp'] = timeCostBgn; }
@@ -129,9 +124,8 @@ window.addEventListener('error', (errorEvent) => {
 		//- override random string
 		var randStr = Hanjst['RandomString'];
 		if(typeof randStr != 'undefined' && randStr != null && randStr != ''){
-			window[tplVarTag+randStr] = Math.random().toString(36).substring(2, 8);
-		}
-		//console.log(logTag+" randStr:"+randStr+" val:"+window[tplVarTag+randStr]);
+			window[tplVarTag+randStr] = Math.random().toString(36).substring(2, 6);
+		}															  
 	}
 	else{
 		console.log(logTag+'tplData:['+tplData+'] has error. 202006041759.'); 
@@ -222,6 +216,7 @@ window.addEventListener('error', (errorEvent) => {
 				staticStr = tplRaw.substring(lastpos, ipos);
 				matchStr = match[0]; exprStr = match[1];
 				tplSegmentPre.push(staticStr);
+				exprStr = exprStr.replace(/"/g, '\\"');
 				tplSegmentPre.push(unParseTag + exprStr);
 				lastpos = ipos + matchStr.length;
 				hasLiteralScript = true;
@@ -242,7 +237,7 @@ window.addEventListener('error', (errorEvent) => {
 		var scriptRe = /<script[^>]*>(.*?)<\/script>/gm;
 		var hasScript = false; var isIncludeScript = false; 
 		var asyncScriptArr = []; var isAsync = false; var srcPos = -1;
-		var regExp1906 = new RegExp("'", 'gm');
+		var regExp1906 = new RegExp("'", 'gm'); var asyncScripti = 0;
 		for(var $prei in tplSegmentPre){
 			tplRawNew = tplSegmentPre[$prei];
 			if(tplRawNew.indexOf(unParseTag) > -1){ // literal scripts
@@ -270,11 +265,12 @@ window.addEventListener('error', (errorEvent) => {
 									//asyncScriptArr.push(exprStr);
 									/* failed for function defined? */
 									exprStr = exprStr.replace(regExp1906, "\\'");
+									exprStr = exprStr.replace(/\\\\'/gm, '\\\\\\\''); //- \\'
 									tplSegment.push('var tmpTimer'+ipos+'=window.setTimeout(function(){try{'
 										+'Hanjst.appendScript(\''+exprStr+'\', \'\');'
 										+'}catch(tmpErr){if('+isDebug+'){console.log("'+logTag
 										+' found error with embed scripts:\"+JSON.stringify(tmpErr)+\"");}};}, '
-										+ 'parseInt(Math.random()*200+100));'); //- why two seconds?
+										+ 'parseInt(Math.random()*100+'+((asyncScripti++)*100)+'));'); //- why two seconds?
 								}
 								else{
 									if(isDebug){ 
@@ -290,7 +286,7 @@ window.addEventListener('error', (errorEvent) => {
 								tplSegment.push('var tmpTimer'+ipos+'=window.setTimeout(function(){try{ Hanjst.appendScript(\'\', \''+matchStr+'\');' 
 										+'}catch(tmpErr){if('+isDebug+'){console.log("'+logTag
 										+' found error with embed src scripts:\"+JSON.stringify(tmpErr)+\"");}};}, '
-										+ 'parseInt(Math.random()*200+100));');
+										+ 'parseInt(Math.random()*100+'+((asyncScripti++)*100)+'));');
 							}
 							else{
 								appendScript(exprStr, matchStr);
@@ -322,7 +318,7 @@ window.addEventListener('error', (errorEvent) => {
 		segStr = ''; segi = 0; var tpl2codeArr = []; var tpl2code = ''; var varList = [];
 		tpl2codeArr.push("var tpl2js = []; var blockLoopCount = 0;");
 		var blockBeginRe, tmpmatch, needSemiComma, containsDot, containsBracket;
-		var tmpArr, containsEqual, tmpIfPos, hasLoopElse, loopElseStr, bracketPos, dotPos;
+		var tmpArr, containsEqual, tmpIfPos, hasLoopElse, loopElseStr, bracketPos, dotPos, tmpi;
 		//- tpl keywords and patterns
 		var tplRe = /\{((for|if|while|else|switch|break|case|\$|\/|var|let|=)[^}]*)\}/gm;
 		for(segi in tplSegment){ //- loop over segments besides originals
@@ -370,6 +366,7 @@ window.addEventListener('error', (errorEvent) => {
 							else if(containsDot && !containsEqual){
 								if(dotPos < bracketPos){
 									//- built-in, $a.substring(0, 5)
+									exprStr = _enSafeExpr(exprStr, varList);
 									tpl2codeArr.push("\ttpl2js.push("+exprStr+");");
 								}
 								else{
@@ -380,6 +377,12 @@ window.addEventListener('error', (errorEvent) => {
 							}
 							else{
 								//- variables operations, $a++, $a=1
+								tmpi = exprStr.indexOf('='+tplVarTag);  
+                                if( tmpi > 0 && exprStr.lastIndexOf('=') <= tmpi 
+									&& !containsDot && !containsBracket){
+                                    exprStr = exprStr.substring(0, tmpi)
+                                        + '=' + _enSafeExpr(exprStr.substring(tmpi+1), varList);
+                                }  
 								tpl2codeArr.push(exprStr + ';');
 								if(containsEqual){ varList.push(exprStr); }
 							}
@@ -396,7 +399,7 @@ window.addEventListener('error', (errorEvent) => {
 						}
 					}
 					else if(exprStr.match(/.*({|;|}).*/gm)
-						&& exprStr.indexOf('t;') == -1){ 
+						&& exprStr.indexOf('t;') == -1 && exprStr.indexOf('amp;') == -1){ 
 						// exceptions, &gt; &lt;
 						matchStr = matchStr.replace(/"/g, '\\"');
 						tpl2codeArr.push("\ttpl2js.push(\""+matchStr+"\");");
@@ -425,11 +428,16 @@ window.addEventListener('error', (errorEvent) => {
 								if(!hasLoopElse){
 									var tmpBrPos = tmpmatch[2].indexOf('(');
 									var tmpDotPos = tmpmatch[2].indexOf('.');
+									tmpmatch[2] = _enSafeExprAsCondition(tmpmatch[2], varList);
 									if(tmpBrPos == -1){
 										exprStr = tmpmatch[1] + '(' + tmpmatch[2] + ')';
 									}
 									else if(tmpDotPos > 0 && tmpDotPos < tmpBrPos){
 										exprStr = tmpmatch[1] + '(' + tmpmatch[2] + ')';
+									}
+									else if(!(tmpmatch[2].match(/(=|>|<)/gm))){
+										exprStr = tmpmatch[1] + '(' + tmpmatch[2] + ')'; 
+										//- if isNaN($num) , 20220721
 									}
 									if(isDebug){
 									console.log(logTag+"illegal tpl sentence:["
@@ -438,6 +446,7 @@ window.addEventListener('error', (errorEvent) => {
 								}
 							}
 							else{
+								//- case | break ?
 								if(isDebug){ console.log("not blockBegin? ["+exprStr+"]"); }
 							}
 							if(!hasLoopElse){ 
@@ -446,13 +455,17 @@ window.addEventListener('error', (errorEvent) => {
 						}
 						else if(exprStr.indexOf('else') == 0){ //- if branch
 							tmpIfPos = exprStr.indexOf('if ');
-							if( tmpIfPos > -1 && exprStr.indexOf('(') < 0){
+							if( tmpIfPos > -1 
+								&& (exprStr.indexOf('(') < 0
+									|| (exprStr.indexOf('(') > 0 && exprStr.indexOf('.') > 0))){
 								if(isDebug){
 								console.log(logTag+"illegal tpl sentence:"+exprStr
 									+" but compatible.");
 								}
-								exprStr = exprStr.substr(0, tmpIfPos+3) 
-									+ '(' + exprStr.substr(tmpIfPos+3) + ')';
+								tmpmatch = exprStr.substr(tmpIfPos+3);
+                                tmpmatch = _enSafeExprAsCondition(tmpmatch, varList);
+                                exprStr = exprStr.substr(0, tmpIfPos+3);
+                                exprStr +=  '(' + tmpmatch + ')';
 							}
 							exprStr = '}\n' + exprStr + '{'; needSemiComma = false;
 						}
@@ -479,6 +492,9 @@ window.addEventListener('error', (errorEvent) => {
 								exprStr = exprStr.replace('eq', '==')
 									.replace('lt', '<')
 									.replace('gt', '>');
+							}
+							if(exprStr.indexOf('&amp;') > -1){
+								exprStr = exprStr.replace((new RegExp("&amp;", "gm")), '&');
 							}
 						}
 						if(hasLoopElse){ // skip first sentence
@@ -519,8 +535,8 @@ window.addEventListener('error', (errorEvent) => {
         catch(e1200){
 			var tmpStr = JSON.stringify(e1200, Object.getOwnPropertyNames(e1200)); 
 			console.log(tmpStr); console.log(logTag + "tpl2code: "+tpl2code);
-			//- use Firefox to figure out exact error lineNumber and columnNumber in tpl2code
-			//- comment by xenxin@ufqi.com, Tue Jun 29 13:49:23 UTC 2021
+			//- use Firefox to figure out exact error lineNumber and columnNumber in tpl2code in new Function
+															   
 			if(isDebug){ window.alert((new Date())+':\n'+tmpStr+'\nUse Firefox to figure out lines detail in tpl2code.'); }
         }
 		Hanjst.tplObject.innerHTML = tplParse;
@@ -710,27 +726,48 @@ window.addEventListener('error', (errorEvent) => {
 		while(match = memoRe.exec(myCont)){
             //console.log("memoRe:match sta:"); console.log(match);
             matchStr = match[0]; segStr = match[1];
-            myContNew = myContNew.replace(matchStr, "/*"+segStr+"*/");
+			if(myContNew.indexOf(matchStr+'\n') > -1){
+				myContNew = myContNew.replace(matchStr+'\n', "/*"+segStr+"*/");
+			}
+			if(myContNew.indexOf(matchStr+'\r') > -1){
+				myContNew = myContNew.replace(matchStr+'\r', "/*"+segStr+"*/");
+			}
         }
-		memoRe = /[ \s;]\/\/(.*?)[\n\r]*$/gm; // "//-" patterns between a line
-		while(match = memoRe.exec(myCont)){
-            //console.log("memoRe:match btw:"); console.log(match);
+		memoRe = /[ \s;,'"]{1}\/\/(.*?)$/gm; // "//-" patterns between a line
+		var matchStrOrig = null; var matchStrFirstChar = null;
+		while(match = memoRe.exec(myCont)){									   
             matchStr = match[0]; segStr = match[1];
-			if(matchStr.indexOf(';')==0){ matchStr = matchStr.substring(1); }
-            myContNew = myContNew.replace(matchStr, "/*"+segStr+"*/");
-        }
+            if(true && (segStr.indexOf(' ') != 0)
+					&& (segStr.indexOf(',') != 0)
+					&& (segStr.indexOf('-') != 0)
+					&& (segStr.match(/[a-zA-Z0-9\-]+?\.[a-zA-Z0-9\-]+?[:]*/gm) 
+						&& (segStr.indexOf(' ') < 0 || segStr.indexOf('/') > -1)
+						)
+					){ 
+						//console.log("memoRe: capture segStr:["+segStr+"] but skiped.");
+						continue; 
+					} // pattern: "'//www.abc.com'" or "://1.2.3:1234", keep urls, 09:46 2022-01-13
+			matchStrOrig = matchStr;
+			matchStrFirstChar = matchStrOrig.substring(0,1);
+			if(false){ matchStr = matchStrOrig.substring(1); } //- disabled 21:45 2021-11-11
+			myContNew = myContNew.replace(matchStrOrig, matchStrFirstChar+"/*"+segStr+"*/"); //- without regExp, Only the first occurrence will be replaced.
+			if(false){
+			console.log("memoRe:match btw: matchStr:["+matchStr+"] segStr:["+segStr+"] new:["+myContNew+"]"); 
+			}
+		}
+		//console.log("myCont:["+myCont+"] new:["+myContNew+"]");
         myCont = myContNew;
 		myCont = myCont.replace(/[\n\r]/g, '');
 		myCont = myCont.replace(/<!--.*?-->/g, '');
-		//console.log("Hanjst: remedyMemoLine:"+myCont);
+												  
         return myCont;
     };
 	
 	//- inner method
 	//- _enSafeExpr
 	var _enSafeExpr = function(expr, varList){
-		var newExpr = expr;
-		if(expr.length > 0 && expr.startsWith(tplVarTag)){
+		var newExpr = expr; expr = expr.trim();
+		if(expr.length > 0 && expr.startsWith(tplVarTag) && expr.indexOf(' ') == -1){
 			var tmpPos = expr.indexOf('[');
 			var tmpExprArr = []; var tmpK = '';
 			if(tmpPos > -1){ //- objects access
@@ -776,7 +813,7 @@ window.addEventListener('error', (errorEvent) => {
 					} 
 				}
 				if(!hasDeclared){
-					newExpr = "(typeof "+tmpK+" == 'undefined') ? '' : ("+newExpr+")";
+					newExpr = "((typeof "+tmpK+" == 'undefined') ? '' : ("+newExpr+"))";
 					targetC++;
 				}
 			}
@@ -786,7 +823,42 @@ window.addEventListener('error', (errorEvent) => {
 		}
 		return newExpr;
 	};
-	
+	//- Sat Apr 24 09:43:50 UTC 2021
+	var _enSafeExprAsCondition = function(exprStr, varList){
+		var newStr = exprStr;
+		if(exprStr.indexOf('[') > -1 && exprStr.indexOf(']') > -1){
+			// if($hashList[$a][$b]==1
+			var exprStrArr = []; var exprStrArrRp = []; 
+			if(exprStr.indexOf('&&') > -1 || exprStr.indexOf('||') > -1){
+				exprStrArr = exprStr.split("/&&|\|\|/");		
+			}
+			else{
+				exprStrArr.push(exprStr);
+			}
+			var arrSize = exprStrArr.length; var segp = '';
+			var leftp = ''; var rightp = ''; var lastrpos = -1;
+			for(var i=0; i<arrSize; i++){
+				segp = exprStrArr[i];
+				lastrpos = segp.lastIndexOf(']');
+				if(lastrpos > -1){
+					leftp = segp.substring(0, lastrpos+1);
+					rightp = segp.substring(lastrpos+1);
+					leftp = _enSafeExpr(leftp, varList); // assume $hashList[$a][$b]
+					segp = leftp + rightp;
+				}
+				exprStrArrRp.push(segp);
+			}
+			// replace with safed str
+			for(var i=0; i<arrSize; i++){
+				segp = exprStrArr[i];
+				newStr = newStr.replace(segp, exprStrArrRp[i]);
+			}
+			if(isDebug){
+				console.log(logTag+"_enSafeExprAsCondition: exprStr:"+exprStr+" newStr:"+newStr);	
+			}
+		} 
+		return newStr;
+	}
 	//- show image in async way
 	//- 13:08 Friday, April 10, 2020, revised 12:25 Saturday, April 18, 2020
 	var showImageAsync = function(imgId){
@@ -795,7 +867,10 @@ window.addEventListener('error', (errorEvent) => {
 			return ;	
 		}
 		else{
-			Hanjst.asyncScriptArr.push('if(true){var imageTimerX=window.setTimeout(function(){var tmpObj=document.getElementById(\''+imgId+'\');if(tmpObj){var dataSrc=tmpObj.getAttribute(\'data-src\');if(dataSrc&&dataSrc!=\'\'){tmpObj.src=dataSrc;}}}, 100);}');
+			var asyncImagei = 0;
+			if(Hanjst.asyncImagei){ asyncImagei = Hanjst.asyncImagei; }
+			Hanjst.asyncScriptArr.push('if(true){var imageTimerX=window.setTimeout(function(){var tmpObj=document.getElementById(\''+imgId+'\');if(tmpObj){var dataSrc=tmpObj.getAttribute(\'data-src\');if(dataSrc&&dataSrc!=\'\'){tmpObj.src=dataSrc;}}}, '+((asyncImagei++)*50)+');}');
+			Hanjst.asyncImagei = asyncImagei;
 		}
 		return ;
 	}
@@ -866,7 +941,7 @@ window.addEventListener('error', (errorEvent) => {
 /*
  *** Philosophy:
  * God's return to God, Caesar's return to Caesar; 
- * the backend runs in background, the frontend is executed in foreground.
+ * the backend runs in background, the frontend is being executed in foreground.
  * 上帝的归上帝, 凯撒的归凯撒; 后端的归后台, 前端的归前台。
  * 
  *** Pros:
@@ -903,6 +978,13 @@ window.addEventListener('error', (errorEvent) => {
  * 09:52 Thursday, June 4, 2020, + import jsonDataId with script.
  * 11:42 6/11/2020, + {=$i+2} support.
  * 21:42 2020-09-01, imprvs for regExp for remedyMemoLine.
- * 09:04 2021-03-17, imprvs for debug in mobile browsers, +support for if conditionExpr
+ * 09:08 2021-03-17, imprvs for debug in mobile browsers, +support for if conditionExpr
+ * 17:09 2021-04-26, + _enSafeExprAsCondition .
+ * 21:32 2021-05-19, bugfix for remedyMemoLine .
+ * 12:31 2021-05-21, bugfix for &amp; .
+ * 09:04 2021-06-07, add more _enSafeExpr .
+ * 21:51 2021-06-29, +comment: use Firefox to figure out exact error lineNumber and columnNumber in tpl2code in new Function
+ * 21:55 2021-11-11, imprvs for remedyMemoLine
+ * 11:37 2022-01-13, bugfix for remedyMemoLine, v2.7
  *** !!!WARNING!!! PLEASE DO NOT COPY & PASTE PIECES OF THESE CODES!
  */

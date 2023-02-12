@@ -154,7 +154,7 @@ header, footer, nav, section, article, hgroup, figure {
 
 body {
   background: white;
-  font: 100%/1.5 "HelveticaNeue", "Helvetica", "Arial", sans-serif;
+  font: 100%/1.5 "HelveticaNeue", "Helvetica", "Arial", "Microsoft Yahei", sans-serif;
   -webkit-text-size-adjust: 100%;
   color: #333333;
 }

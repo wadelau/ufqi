@@ -36,3 +36,5 @@ function dispTypeSelect(myType){
 		window.location.href = myUrl;
 	}
 }
+
+
