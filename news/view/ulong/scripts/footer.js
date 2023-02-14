@@ -327,7 +327,7 @@ function resizeWindow(){
 			if(logoLink){
 				var clientRdi = parseInt(Math.random()*100000);
 				var currentHref = '';
-				if(clientRdi != null && typeof of clientRdi != 'undefined'){
+				if(clientRdi != null && typeof clientRdi != 'undefined'){
 					currentHref = logoLink.href;
 					if(currentHref == null || typeof currentHref == 'undefined'){
 						currentHref = '';
