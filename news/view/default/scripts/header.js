@@ -57,7 +57,7 @@ function matchAdv(advList, keyList){
 		}
 		if(hasMatched){
 			tgtAdv = advList[i2];
-			console.log("found matched: i2:"+i2+"/"+tmpTit+" i3:"+i3+"/"+tmpKey);
+			//console.log("found matched: i2:"+i2+"/"+tmpTit+" i3:"+i3+"/"+tmpKey);
 			break;
 		}
 	}
@@ -79,7 +79,7 @@ function getRandAdv($advList){
 function tinyGradient(myObj){
 	var sizeChange = 1; //- min value: 1px
 	var gradientStep = 0.15; var myMax = 100; 
-	var mySizeMin = 130; var mySizeMax = 178; //- same as css
+	var mySizeMin = 120; var mySizeMax = 168; //- same as css
 	if(myObj){
 		var mySize = myObj.height;
 		var tmpRandi = Math.floor(Math.random() * Math.floor(myMax));

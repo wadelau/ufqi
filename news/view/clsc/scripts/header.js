@@ -57,7 +57,7 @@ function matchAdv(advList, keyList){
 		}
 		if(hasMatched){
 			tgtAdv = advList[i2];
-			console.log("found matched: i2:"+i2+"/"+tmpTit+" i3:"+i3+"/"+tmpKey);
+			//console.log("found matched: i2:"+i2+"/"+tmpTit+" i3:"+i3+"/"+tmpKey);
 			break;
 		}
 	}

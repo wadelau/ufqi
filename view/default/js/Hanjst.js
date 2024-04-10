@@ -9,7 +9,7 @@
  * @ Xenxin@ufqi.com, Wadelau@hotmail.com, Wadelau@gmail.com
  * @Since July 07, 2016, refactor on Oct 10, 2018
  * @More at the page footer.
- * @Ver 2.7
+ * @Ver 2.92
  */
 
 "use strict"; //- we are serious
@@ -320,7 +320,7 @@ window.Hanjst = window.HanjstDefault;
 		var blockBeginRe, tmpmatch, needSemiComma, containsDot, containsBracket;
 		var tmpArr, containsEqual, tmpIfPos, hasLoopElse, loopElseStr, bracketPos, dotPos, tmpi;
 		//- tpl keywords and patterns
-		var tplRe = /\{((for|if|while|else|switch|break|case|\$|\/|var|let|=)[^}]*)\}/gm;
+		var tplRe = /\{((for|if|while|else|switch|break|continue|case|\$|\/|var|let|=)[^}]*)\}/gm;
 		for(segi in tplSegment){ //- loop over segments besides originals
 			segStr = tplSegment[segi];
 			if(segStr.indexOf(unParseTag) > -1){ //- literal scripts
@@ -337,7 +337,7 @@ window.Hanjst = window.HanjstDefault;
 				while(match = tplRe.exec(segStr)){
 					ipos = match.index;
 					staticStr = segStr.substring(lastpos, ipos);
-					staticStr = staticStr.replace(/"/g, '\\"');
+					staticStr = staticStr.replace(/"/g, '\\"').trimEnd();
 					if(staticStr != ''){
 						if(hasLoopElse){
 							loopElseStr += staticStr; // empty after every loop at end
@@ -362,6 +362,7 @@ window.Hanjst = window.HanjstDefault;
 								//- private, $aFunc($a)
 								exprStr = exprStr.substring(1);
 								tpl2codeArr.push("\ttpl2js.push("+exprStr+");");
+								//-? consider hasLoopElse?
 							}
 							else if(containsDot && !containsEqual){
 								if(dotPos < bracketPos){
@@ -436,17 +437,19 @@ window.Hanjst = window.HanjstDefault;
 										exprStr = tmpmatch[1] + '(' + tmpmatch[2] + ')';
 									}
 									else if(!(tmpmatch[2].match(/(=|>|<)/gm))){
-										exprStr = tmpmatch[1] + '(' + tmpmatch[2] + ')'; 
+										if(tmpmatch[2].trim().indexOf('(') != 0){
+											exprStr = tmpmatch[1] + '(' + tmpmatch[2] + ')';
+										}										
 										//- if isNaN($num) , 20220721
 									}
 									if(isDebug){
-									console.log(logTag+"illegal tpl sentence:["
-										+exprStr+"] but compatible. tmpBrPos:"+tmpBrPos+" tmpDotPos:"+tmpDotPos);
+										console.log(logTag+"illegal tpl sentence:["
+											+exprStr+"] but compatible. tmpBrPos:"+tmpBrPos+" tmpDotPos:"+tmpDotPos);
 									}
 								}
 							}
 							else{
-								//- case | break ?
+								//- case|break ?
 								if(isDebug){ console.log("not blockBegin? ["+exprStr+"]"); }
 							}
 							if(!hasLoopElse){ 
@@ -484,14 +487,14 @@ window.Hanjst = window.HanjstDefault;
 						}
 						if(exprStr != ''){
 							if(exprStr.indexOf('t;') > -1){
-								exprStr = exprStr.replace('&gt;', '>');
-								exprStr = exprStr.replace('&lt;', '<');
+								exprStr = exprStr.replace((new RegExp("&gt;", "gm")), '>'); //- replace all
+								exprStr = exprStr.replace((new RegExp("&lt;", "gm")), '<');
 							}
 							if(needSemiComma){ exprStr += ';'; }
 							if(exprStr.match(/ (eq|lt|gt) /)){
 								exprStr = exprStr.replace('eq', '==')
 									.replace('lt', '<')
-									.replace('gt', '>');
+									.replace('gt', '>'); //- simple operators in inline-sentence
 							}
 							if(exprStr.indexOf('&amp;') > -1){
 								exprStr = exprStr.replace((new RegExp("&amp;", "gm")), '&');
@@ -508,7 +511,7 @@ window.Hanjst = window.HanjstDefault;
 				}
 				//- last static part
 				staticStr = segStr.substring(lastpos);
-				staticStr = staticStr.replace(/"/g, '\\"');
+				staticStr = staticStr.replace(/"/g, '\\"').trimEnd();
 				if(staticStr != ''){
 					tpl2codeArr.push("\ttpl2js.push(\""+staticStr+"\");");
 				}
@@ -727,10 +730,15 @@ window.Hanjst = window.HanjstDefault;
             //console.log("memoRe:match sta:"); console.log(match);
             matchStr = match[0]; segStr = match[1];
 			if(myContNew.indexOf(matchStr+'\n') > -1){
-				myContNew = myContNew.replace(matchStr+'\n', "/*"+segStr+"*/");
+				myContNew = myContNew.replace(matchStr+'\n', "/*"+segStr+"*/"); 
 			}
-			if(myContNew.indexOf(matchStr+'\r') > -1){
+			else if(myContNew.indexOf(matchStr+'\r') > -1){
 				myContNew = myContNew.replace(matchStr+'\r', "/*"+segStr+"*/");
+			}
+			else{
+				if(matchStr.indexOf('\n')==0 || matchStr.indexOf('\r')==0){ matchStr = matchStr.substring(1); } //- "\n//-"
+				myContNew = myContNew.replace(matchStr, "/*"+segStr+"*/");
+				//console.log("memoRe:match sta: not found with \\n or \\r. ");
 			}
         }
 		memoRe = /[ \s;,'"]{1}\/\/(.*?)$/gm; // "//-" patterns between a line
@@ -746,7 +754,7 @@ window.Hanjst = window.HanjstDefault;
 					){ 
 						//console.log("memoRe: capture segStr:["+segStr+"] but skiped.");
 						continue; 
-					} // pattern: "'//www.abc.com'" or "://1.2.3:1234", keep urls, 09:46 2022-01-13
+					} // pattern: "'//www.abc.com'" or "://1.2.3:1234", keep urls, 09:46 2022-01-13, updt 12:38 2022-03-10
 			matchStrOrig = matchStr;
 			matchStrFirstChar = matchStrOrig.substring(0,1);
 			if(false){ matchStr = matchStrOrig.substring(1); } //- disabled 21:45 2021-11-11
@@ -917,8 +925,13 @@ window.Hanjst = window.HanjstDefault;
 					};
 				}, parseInt(Math.random()*100)+200);
 			}
-            
         }
+		//- 09:17 2024-01-31
+		var timer2FreeUp = window.setTimeout(function(){
+				Hanjstjsondata = null; 
+				HanjstDefault = null;
+				Hanjst = null;
+			}, 1*1000);
     };
 	
 	//- set a trigger to Hanjst
@@ -986,5 +999,10 @@ window.Hanjst = window.HanjstDefault;
  * 21:51 2021-06-29, +comment: use Firefox to figure out exact error lineNumber and columnNumber in tpl2code in new Function
  * 21:55 2021-11-11, imprvs for remedyMemoLine
  * 11:37 2022-01-13, bugfix for remedyMemoLine, v2.7
+ * 08:09 2022-06-04, imprvs for delay more time for async scripts, v2.8
+ * 22:14 2022-06-07, +asyncScripti for async include scripts embedded, v2.9
+ * 20:40 2023-06-29, minor bugfix for remedyMemoLine, v2.92
+ * 14:15 2024-03-01, +continue, v2.93
+ * 11:37 2024-03-22, +trimEnd for staticStr, rm empty lines. v2.94
  *** !!!WARNING!!! PLEASE DO NOT COPY & PASTE PIECES OF THESE CODES!
  */

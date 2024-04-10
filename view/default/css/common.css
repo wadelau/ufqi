@@ -3,8 +3,9 @@ body {
 	padding: 0px;
 	margin: 0px auto;
 	max-width: 768px;
-	background-color: #f5f5f7;
+	background-color: #def7dc; /* #f5f5f7; */
 	font: 100%/1.5 "HelveticaNeue", "Helvetica", "Arial", "Microsoft Yahei", sans-serif;
+	font-family:var(--site-font,Arial,Helvetica,sans-serif);
 }
 
 a {

@@ -54,9 +54,11 @@ a {
 }
 a:hover {
 	text-underline-offset: 4px;
+	font-weight:bolder;
 }
 a.whitea{
 	color:white;	
+	letter-spacing: 0px;
 }
 
 .header {

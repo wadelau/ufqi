@@ -210,4 +210,5 @@ a.whitea{
 .thePageUrl {
 	border:0px; max-width:92%;
 	width:75%; background-color:transparent;
+	overflow:hidden;
 }
