@@ -151,3 +151,21 @@ function calculateTimeWeight(unitCount, dateType){
 	//console.log("calculateTimeWeight: unitCount:"+unitCount+" timeWeight:"+timeWeight);
 	return timeWeight;
 }
+//- calculate trade count weight, 10:04 2024-04-12
+//- 5%-, -0.06, 60 of 1000 as top; 5~10%, -0.03; 10~15%, 0.0; 15%+, 0.01
+function calculateTradeWeight(unitCount, trdCount){
+	var trdWeight=0.0;
+	var trdPt = trdCount/unitCount; var trdPtFix1Pos=0.05, trdPtFix2Pos=0.10, trdPtFix3Pos=0.15;
+	var trdPtFix1Val=-0.08, trdPtFix2Val=-0.04, trdPtFix3Val=0.01;
+	if(trdPt < trdPtFix1Pos){
+		trdWeight = trdPtFix1Val;
+	}
+	else if(trdPt>=trdPtFix1Pos && trdPt<trdPtFix2Pos){
+		trdWeight = trdPtFix2Val;
+	}
+	else if(trdPt >= trdPtFix3Pos){
+		trdWeight = trdPtFix3Val;
+	}
+	//console.log("calculateTradeWeight: trdPt:"+trdPt+" weight:"+trdWeight);
+	return trdWeight;
+}

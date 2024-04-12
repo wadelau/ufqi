@@ -42,7 +42,10 @@ body {
   -webkit-align-content: stretch;
       -ms-flex-line-pack: stretch;
           align-content: stretch;
-  background: #ececec; }
+  /*background: #ececec;*/
+  background: linear-gradient(1deg, #def7dc, transparent);
+  
+  }
 
 img {
 	border-radius: 10px; }
