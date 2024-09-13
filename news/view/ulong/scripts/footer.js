@@ -330,7 +330,7 @@ function resizeWindow(){
 				if(clientRdi != null && typeof clientRdi != 'undefined'){
 					currentHref = logoLink.href;
 					if(currentHref == null || typeof currentHref == 'undefined'){
-						currentHref = '';
+						currentHref = new Object();
 					}
 				}
 				var currentHrefPos = currentHref.indexOf('clientRdi=');

@@ -8,54 +8,6 @@ var getWeekNo = function(myDateStrOrMilliSecond){
 	//console.log("timestamp:["+myDateStrOrMilliSecond+"] currentdate:["+currentdate+"] day:["+currentdate.getDay()+"] numberOfDays:["+numberOfDays+"] ceil resultNo:["+resultNo+"]");
 	return [currentdate.getFullYear(), resultNo];
 };
-//- append marker for trade, 11:50 2022-11-27
-var appendMark = function(myItem, isWeekView){
-	var theItem = myItem;
-	var tmpDate = null; var tmpTime = 0; var tradeInfo = {}; 
-	var hasSold = false; var tmpTimeSell = 0;
-	var weekNo1=0, weekNo2=0, weekNo3=0, hasMark=0; 
-	for(var ti in $fundTradeList){
-		tradeInfo = $fundTradeList[ti];
-		if(typeof tradeInfo != 'undefined'){
-			if(typeof tradeInfo['hasMark'] != 'undefined'){ 
-				hasMark = tradeInfo['hasMark'];
-				if(hasMark > 1){ continue; }
-			}
-			else{ hasMark = 0; }
-			if(tradeInfo['sell_date'].indexOf('1000') > -1){ hasSold = false; }else{ hasSold = true; }
-			if(hasSold){ 
-				tmpDate = new Date(tradeInfo['sell_date']); 
-				tmpTimeSell = tmpDate.getTime();
-				tmpDate = new Date(tradeInfo['idate']);
-			}
-			else{ 
-				tmpDate = new Date(tradeInfo['idate']);
-				tmpTimeSell = 0;
-			} 
-			tmpTime = tmpDate.getTime();
-			//console.log("appendMark: tmpDate:"+tmpDate+" tmpTime:"+tmpTime+"/theTime:"+theItem[0]+" timeZoneShift:"+timeZoneShift+" balance:"+(tmpTime-theItem[0])+". theItem:"+theItem);
-			if(theItem[0] == tmpTime+1000){ //- 1 second more, see timeZoneShift
-				theItem.push(1); hasMark++; //- buy-in
-			}
-			else if(theItem[0] == tmpTimeSell+1000){ //- 1 second more, see timeZoneShift
-				theItem.push(-1); hasMark++; //- sell-out
-			}
-			else if(isWeekView){
-				weekNo1 = getWeekNo(theItem[0]); weekNo2 = getWeekNo(tmpTime);
-				weekNo3 = getWeekNo(tmpTimeSell);
-				if(weekNo1[0] == weekNo2[0] && weekNo1[1] == weekNo2[1]){
-					theItem.push(1); hasMark++; //- buy-in
-				}
-				else if(weekNo1[0] == weekNo3[0] && weekNo1[1] == weekNo3[1]){
-					theItem.push(-1); hasMark++; //- sell-out
-				}
-			}
-			tradeInfo['hasMark'] = hasMark; $fundTradeList[ti] = tradeInfo; //- marked only once
-		}		
-	}
-	return theItem;
-};
-
 //-
 function changePriceSwitch(itype){
 	var priceObj = _getElement('appendprice');
@@ -110,7 +62,7 @@ function drawTable(myData){
 		if(i==0){ tmpDateStr=tmpDate.format('YYYY')+' <br/>'+tmpDate.format('mm-dd'); }
 		else{ tmpDateStr=tmpDate.format('mm-dd'); }
 		tbl += '<tr><td> '+(i+1)+'</td><td>'+tmpDateStr
-			+'</td><td>'+tmpData[1].toFixed(2)+'</td><td> '+(diff>0?'+':'')+
+			+'</td><td>'+tmpData[1].toFixed(3)+'</td><td> '+(diff>0?'+':'')+
 			+diff.toFixed(3)+'</td><td>'+plusMark+plusCount
 			+' &nbsp;'+diffPercent+(i==0?'%':'')+'</td><td>'+firstDiffStr+(i==0?'%':'')+'</span></td></tr>';
 		lastPrice = tmpData[1]; lastDiff = parseFloat(diffPercent);
@@ -119,7 +71,8 @@ function drawTable(myData){
 	tbl += '<tr><td>'+(last12+1)+'</td><td>'+tmpDate.format("YYYY")+' <br/>'
 		+tmpDate.format("mm-dd")+'</td><td>'+initalVal[1].toFixed(3)
 		+'</td><td>-</td><td>-</td><td>-</td></tr>';
-	var stableNums = calculateStableRank(); var weekWins = calculateWinNum();
+	var stableNums = calculateStableRank(); finalPriceData.stableNumList = stableNums;
+	var weekWins = calculateWinNum(); finalPriceData.weekWinList = weekWins;
 	var periodTag = '周'; if($dataTimeType == 'daily'){ periodTag = '日'; }
 	var otherStats = '<p>年化收益率: '+calculateAnnualRank()
 		+' '+parseFloat($fundPriceStat['annualrate']).toFixed(1)+'% &nbsp;&nbsp; <span class="nobreakblock">稳定增長率: '+stableNums['rankStar']+' '
@@ -150,6 +103,7 @@ function drawTable(myData){
 	otherStats += '<p><span id="strategyTestbuyUp"></span></p>';
 	otherStats += '<p><span id="strategyTestbuyDown"></span></p>';
 	_getElement('tableData').innerHTML = otherStats + tbl + '</table>';
+	tbl=null; myData=null; data=null; 
 }
 //- 07:49 2023-04-13
 function calculateAnnualRank(){
@@ -159,7 +113,7 @@ function calculateAnnualRank(){
 	var annualrate = parseFloat($fundPriceStat['annualrate']);
 	var rankStars = '';
 	if(annualrate <= 0.0){
-		rankStars = '❌';
+		rankStars = '<span class="wrongtag">❌</span>';
 	}
 	else if(annualrate >0.0 && annualrate < 5.0){
 		rankStars = '⭐☆☆☆☆';
@@ -222,7 +176,7 @@ function calculateStableRank(){
 	}
 	var rankStars = '';
 	if(stableNum < rankStep){
-		rankStars = '❌';
+		rankStars = '<span class="wrongtag">❌</span>';
 	}
 	else if(stableNum >= rankStep && stableNum < rankStep*2){
 		rankStars = '⭐☆☆☆☆';
@@ -270,7 +224,7 @@ function calculateWinNum(){
 	//- 0.36 ~ 0.66, see srv22/tools/ufqifina/fundstat
 	if(wSum < 50){ winPert = 0.0; }
 	var rankStars = '';
-	if(winPert < 50){ rankStars = '❌'; }
+	if(winPert < 50){ rankStars = '<span class="wrongtag">❌</span>'; }
 	else if(winPert >= 50 && winPert < 51){ rankStars = '⭐☆☆☆☆'; }
 	else if(winPert >= 51 && winPert < 53){ rankStars = '⭐⭐☆☆☆'; }
 	else if(winPert >= 53 && winPert < 55){ rankStars = '⭐⭐⭐☆☆'; }
