@@ -20,12 +20,33 @@ function changePriceSwitch(itype){
 	}
 	return 0;
 }
+//- update buyin href, 21:18 2024-10-22
+function updtBuyIn(myCode, tacticDesc){
+	var bUrl = $url + '&mod=financefund&act=buyin&buyicode='+myCode;
+	if(tacticDesc==null){ tacticDesc = _getElement('strategyTestTacticDesc').innerText; }
+	var descLen = tacticDesc.length; var klp = tacticDesc.substring(descLen-4, descLen);
+	klp = klp.trim(); klpBlank = klp.indexOf(' ');
+	if(klpBlank > -1){ klp = klp.substring(klpBlank+1, klp.length()); }
+	bUrl = bUrl + '&klp='+klp;
+	var holdPos = tacticDesc.indexOf('hold '); var hld=0;
+	if(holdPos == -1){ 
+		holdPos=tacticDesc.indexOf('holds '); 
+		hld = tacticDesc.substring(holdPos+6, holdPos+8);
+	}
+	else{
+		hld = tacticDesc.substring(holdPos+5, holdPos+7);
+	}
+	if(hld.indexOf('d') > -1){ hld = hld.replace('d', ''); }
+	bUrl = bUrl + '&hold='+hld;
+	buyInHref = _getElement('hrefbuyin'); buyInHref.href = bUrl;
+	return 0;
+}
 
 //- added by xenxin@ufqi, 12:07 2022-09-17
 function drawTable(myData){
 	//console.log("drawTable:"); 
 	var data = myData.xdata;
-	var len = data.length; var last12 = 16; 
+	var len = data.length; var last12 = 20; 
 	var tmpData = null; var tmpDate = null; var tmpDataLast = null;
 	var lastPrice = 0.0; var diff = 0.0; var diffPercent = 0.0;
 	var tbl = '<table class="tbldata"><tr><td colspan="6"><strong>'+myData.iname+'-'
@@ -102,8 +123,9 @@ function drawTable(myData){
 	otherStats += '<p><span id="strategyTestbuyAny"></span></p>';
 	otherStats += '<p><span id="strategyTestbuyUp"></span></p>';
 	otherStats += '<p><span id="strategyTestbuyDown"></span></p>';
+	otherStats += '<p><span id="strategyTestTacticDesc" style="display:none;"></span></p>';
 	_getElement('tableData').innerHTML = otherStats + tbl + '</table>';
-	tbl=null; myData=null; data=null; 
+	tbl=null; myData=null; data=null; otherStats = null;
 }
 //- 07:49 2023-04-13
 function calculateAnnualRank(){

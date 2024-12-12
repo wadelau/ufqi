@@ -2,6 +2,7 @@
 //- Finance Policy/Strategy, backtesting
 //- xenxin@ufqi, 15:27 2024-01-12
 //- temp pause for in-line scripts. 21:52 2024-02-12
+//- updt main func strategyCatX for stoping linkDrop=0, 15:53 2024-11-20
 
 //- finance strategies backtest, 2nd stage, 18:15 2024-01-12
 //- xenxin@ufqi
@@ -11,38 +12,46 @@ function strategyCatX(dateType, thePriceData, btType, btEntry){
 	var results = ""; var maxWinPt = -10000; //- lowest: win:-100, cagr:-100
 	var maxDayCt = 0; var maxTestType = '';
 	var dynamicSellThreshold = 6; //- at least for free of trans fee, one week, 7 days
-	var unitBgn = 6; unitCtLimit = 15; //- 6˜15 trading days, 21 calendar days
+	var unitBgn = 6; unitCtLimit = 20; //- 6˜20 trading days, 28 calendar days, 4 weeks
 	if(dateType == 'weekly'){ 
-		unitBgn = 1;  unitCtLimit = 7; //- 7 weeks for trading, 49 calendar days
+		unitBgn = 1;  unitCtLimit = 7; //- 7 weeks for trading, 49 calendar days, 7 weeks
 		dynamicSellThreshold = 1; //- at least for free of trans fee, one week
 	}
-	var isFixedSell = false;
+	var isFixedSell = false; var tmpWinPt = 0.0;
 	if(btType == '' || btType == 'fixed'){ isFixedSell = true; } //- sell type
 	if(isFixedSell){
 		for(var dayc=unitBgn; dayc<=unitCtLimit; dayc++){
 			$backtestType = ''; //- buy type
+			//- strictly execute stop-loss of alerts in postion page,
+			//- so do not compute the score of linkDrop=0, 15:50 2024-11-20
+			/*
 			var tmpWinPt = strategyCat(dateType, thePriceData, dayc, btType, btEntry, $backtestType, 0);
 			if(tmpWinPt > maxWinPt){
 				maxWinPt = tmpWinPt; maxDayCt = dayc; maxTestType = $backtestType;
 			}
+			*/
 			tmpWinPt = strategyCat(dateType, thePriceData, dayc, btType, btEntry, $backtestType, 1);
 			if(tmpWinPt > maxWinPt){
 				maxWinPt = tmpWinPt; maxDayCt = dayc; maxTestType = $backtestType;
 			}
 			$backtestType = 'buyUp';
+			/*
 			tmpWinPt = strategyCat(dateType, thePriceData, dayc, btType, btEntry, $backtestType, 0);
 			if(tmpWinPt > maxWinPt){
 				maxWinPt = tmpWinPt; maxDayCt = dayc; maxTestType = $backtestType;
 			}
+			*/
 			tmpWinPt = strategyCat(dateType, thePriceData, dayc, btType, btEntry, $backtestType, 1);
 			if(tmpWinPt > maxWinPt){
 				maxWinPt = tmpWinPt; maxDayCt = dayc; maxTestType = $backtestType;
 			}
 			$backtestType = 'buyDown';
+			/*
 			tmpWinPt = strategyCat(dateType, thePriceData, dayc, btType, btEntry, $backtestType, 0);
 			if(tmpWinPt > maxWinPt){
 				maxWinPt = tmpWinPt; maxDayCt = dayc; maxTestType = $backtestType;
 			}
+			*/
 			tmpWinPt = strategyCat(dateType, thePriceData, dayc, btType, btEntry, $backtestType, 1);
 			if(tmpWinPt > maxWinPt){
 				maxWinPt = tmpWinPt; maxDayCt = dayc; maxTestType = $backtestType;
@@ -50,30 +59,36 @@ function strategyCatX(dateType, thePriceData, btType, btEntry){
 		}
 	}
 	else{
-		$backtestType = '';
-		var tmpWinPt = strategyCat(dateType, thePriceData, dynamicSellThreshold, btType, btEntry, $backtestType, 0);
+		$backtestType = ''; var dynSellDayc = dynamicSellThreshold;
+		/*
+		var tmpWinPt = strategyCat(dateType, thePriceData, dynSellDayc, btType, btEntry, $backtestType, 0);
 		if(tmpWinPt > maxWinPt){
 			maxWinPt = tmpWinPt; maxDayCt = dynamicSellThreshold; maxTestType = $backtestType;
 		}
-		tmpWinPt = strategyCat(dateType, thePriceData, dynamicSellThreshold, btType, btEntry, $backtestType, 1);
+		*/
+		tmpWinPt = strategyCat(dateType, thePriceData, dynSellDayc, btType, btEntry, $backtestType, 1);
 		if(tmpWinPt > maxWinPt){
 			maxWinPt = tmpWinPt; maxDayCt = dynamicSellThreshold; maxTestType = $backtestType;
 		}
 		$backtestType = 'buyUp';
-		tmpWinPt = strategyCat(dateType, thePriceData, dynamicSellThreshold, btType, btEntry, $backtestType, 0);
+		/*
+		tmpWinPt = strategyCat(dateType, thePriceData, dynSellDayc, btType, btEntry, $backtestType, 0);
 		if(tmpWinPt > maxWinPt){
 			maxWinPt = tmpWinPt; maxDayCt = dynamicSellThreshold; maxTestType = $backtestType;
 		}
-		tmpWinPt = strategyCat(dateType, thePriceData, dynamicSellThreshold, btType, btEntry, $backtestType, 1);
+		*/
+		tmpWinPt = strategyCat(dateType, thePriceData, dynSellDayc, btType, btEntry, $backtestType, 1);
 		if(tmpWinPt > maxWinPt){
 			maxWinPt = tmpWinPt; maxDayCt = dynamicSellThreshold; maxTestType = $backtestType;
 		}
 		$backtestType = 'buyDown';
-		tmpWinPt = strategyCat(dateType, thePriceData, dynamicSellThreshold, btType, btEntry, $backtestType, 0);
+		/*
+		tmpWinPt = strategyCat(dateType, thePriceData, dynSellDayc, btType, btEntry, $backtestType, 0);
 		if(tmpWinPt > maxWinPt){
 			maxWinPt = tmpWinPt; maxDayCt = dynamicSellThreshold; maxTestType = $backtestType;
 		}
-		tmpWinPt = strategyCat(dateType, thePriceData, dynamicSellThreshold, btType, btEntry, $backtestType, 1);
+		*/
+		tmpWinPt = strategyCat(dateType, thePriceData, dynSellDayc, btType, btEntry, $backtestType, 1);
 		if(tmpWinPt > maxWinPt){
 			maxWinPt = tmpWinPt; maxDayCt = dynamicSellThreshold; maxTestType = $backtestType;
 		}
@@ -108,6 +123,8 @@ var strategyCatAAA = function(dateType, thePriceData){
 };
 
 //-added 12:02 2024-01-18
+//- slope=0.25=>angel=15, 0.1:5, 0.5:30, 0.8:45, 14:58 2024-10-17
+//- in angel in frontend, but in slope degree in backend
 function calculateSlope(pointA, pointB){
 	var slp = 0.0;
 	if(pointA[1]==0.0 || pointB[1]==0.0){ slp = 0.0; }
@@ -134,7 +151,8 @@ function annualRateFromPeriod(periodRate, days){
 	else{ 
 		days = days + Math.floor(days/5)*2; 
 	}
-	if(periodRate < -1.0){
+	//- periodRate should be 0.0~1.0 or negative
+	if(periodRate < -0.0){
 		irate = Math.pow((1 + (-periodRate)), (365/days)) - 1;
 		irate = -irate;
 	}
@@ -150,7 +168,7 @@ function calculateTimeWeight(unitCount, dateType){
 	//- yr2WorkingDays=522, -20% as begin of 418, +20% as end of 626, keep same range, yr2Weeks=104
 	//- timeWeight: 0.05, as 50 0f 1000 as top
 	var timeWeight=0.0, yr2WorkingDaysBgn=418, yr2WorkingDaysEnd=626, 
-		yr2WeeksBgn=83, yr2WeeksEnd=125, weightUnit=0.15, weightUnitDown=-0.40;
+		yr2WeeksBgn=83, yr2WeeksEnd=125, weightUnit=0.05, weightUnitDown=-0.10;
 	if(dateType=='weekly'){
 		if(unitCount < yr2WeeksBgn){ timeWeight = weightUnitDown*(yr2WeeksBgn/unitCount); }
 		else if(unitCount >= yr2WeeksEnd){ timeWeight = weightUnit*(unitCount/yr2WeeksEnd); }
@@ -167,7 +185,7 @@ function calculateTimeWeight(unitCount, dateType){
 function calculateTradeWeight(unitCount, trdCount){
 	var trdWeight=0.0;
 	var trdPt = trdCount/unitCount;
-	var offset=0.1, changeUnitUp=20, changeUnitDn=25;
+	var offset=0.1, changeUnitUp=10, changeUnitDn=15;
 	var change = (trdPt - offset) / offset;
 	if(change > 0){
 		trdWeight = change / changeUnitUp;
@@ -257,10 +275,25 @@ function computeRSWeight(priceList, dayCount, mktRsVal){
 	if(myRs>mktRsVal && realRs<0.0){ realRs = -realRs; }
 	else if(myRs<mktRsVal && realRs>0.0){ realRs = -realRs; }
 	finalPriceData.rsValue = realRs;
+	var upScale = 2.5, downScale = -2.0;
 	//- set weight to different realRs
-	if(realRs > 0.0){ rsWgt = 1.3 * Math.log2(realRs); }
+	if(realRs > 0.0){ 
+		if(realRs < 1.0){
+			rsWgt = upScale * (-Math.log10(realRs)); //- log2(0.x) yields negative value
+		}
+		else{
+			rsWgt = upScale	* Math.log10(realRs);
+		}
+	}
 	else if(realRs == 0.0){ rsWgt = 0.0; }
-	else{ rsWgt = -2.0 * Math.log2(-realRs); }
+	else{ 
+		if(realRs > -1.0){
+			rsWgt = downScale * (-Math.log10(-realRs));  //- log2(0.x) yields negative value
+		}
+		else{
+			rsWgt = downScale * Math.log10(-realRs);
+		} 
+	}
 	rsWgt = rsWgt / 100;
 	/*
 	if(realRs>=300){ rsWgt = 0.1; } //- double index performance
@@ -289,29 +322,69 @@ var computeWma = function(itemArray){
 };
 //- compute volume weight, using private volume data, 12:17 2024-06-11
 var computeVolumeWeight = function(volumeData){
-	var vwgt=0.0, vsize=volumeData.length, curVol=0.0, wmaVol=0.0, wd=0.0;
+	var vwgt=0.0, vsize=volumeData.length, curVol=0.0, wmaVol=0.0, wd=0.0, minVol=0.01;
 	var bgnOffset=3, endOffset=13; //- rm predicts
-	var upScale=3.5, downScale=-2.5;
+	var upScale=4.0, downScale=-3.0; //- 3.5 -> 5.5, 09:42 2024-11-29
 	if(vsize > 10){
 		var myArr=[], ldp=vsize-endOffset;
 		for(var vd=vsize-bgnOffset; vd>ldp; vd--){
 			if(volumeData[vd]==null){ volumeData[vd]=[1, 1]; }
 			myArr.push(volumeData[vd][1]);
 		}
-		curVol = volumeData[vsize-1][1];
+		curVol = volumeData[vsize-bgnOffset][1]; //- consider QDII?
 		wmaVol = computeWma(myArr);
-		curVol = curVol==0.0 ? 0.01 : curVol;
-		wmaVol = wmaVol==0.0 ? curVol : wmaVol;
+		curVol = curVol==0.0 ? minVol : curVol;
+		wmaVol = wmaVol==0.0 ? minVol : wmaVol;
 		wd = ((curVol - wmaVol) / wmaVol) * 100;
-		
-		if(wd > 0.0){ vwgt = upScale * Math.log2(wd); }
-		else if(wd == 0.0){ vwgt = 0.0; }
-		else{ vwgt = downScale * Math.log2(-wd); }
+		if(wd > 0.0){ 
+			if(wd < 1.0){
+				vwgt = upScale * (-Math.log2(wd)); //- log2(0.x) yields negative value 
+			}
+			else{
+				vwgt = upScale * Math.log2(wd);
+			}			
+		}
+		else if(wd == 0.0){ vwgt = minVol; }
+		else{
+			if(wd > -1.0){
+				vwgt = downScale * (-Math.log2(-wd)); //- log2(0.x) yields negative value
+			}
+			else{
+				vwgt = downScale * Math.log2(-wd);
+			}
+		}
 		vwgt = vwgt / 100;
 	}
 	//console.log(" computeVolumeWeight: curVol:"+curVol+" wmaVol:"+wmaVol+" wd:"+wd+" vwgt:"+vwgt+" myArr:"+myArr);
 	return vwgt;
 };
+//- compute turnover rate weight, 14:51 2024-12-03
+var computeTurnOverRateWeight = function(myPriceData){
+	var tovwgt=0.0, upScale=4.0, downScale=-3.0;
+	var dataSize=Object.keys(myPriceData).length, curPrice={}, tov=0.0;
+	var stepC=1.0, stepA=2.0, stepB=8.0;
+	//console.log("dataSize:"+dataSize+" curPrice:"+(myPriceData[dataSize-1]));
+	curPrice = myPriceData[dataSize-1]; tov = curPrice['turnover'];
+	if(tov < 0.0){ tov = 0.0; } // assume tov not negative
+	if(tov < stepA){
+		if(tov == 0.0){ tovwgt = tov; }
+		else if(tov > 0.0 && tov < stepC){ 
+			tovwgt = downScale * (-Math.log2(tov)); //- log2(0.x) yields negative value 
+		}
+		else{ 
+			//- let it be.
+		}
+	}
+	else if(tov >= stepA && tov < stepB){
+		tovwgt = upScale * Math.log2(tov);
+	}
+	else{
+		tovwgt = downScale * Math.log2(tov);
+	}
+	tovwgt = tovwgt / 100;
+	//console.log(" computeTurnOverRateWeight: tov:"+tov+" tovwgt:"+tovwgt);
+	return tovwgt;
+}
 
 //- round a number to another with x decimals, 15:34 2024-07-04
 var round2Precision = function(number, precision){
