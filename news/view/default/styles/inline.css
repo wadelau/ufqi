@@ -202,7 +202,7 @@ a.whitea{
 }
 
 .inlineblock {
-    display:inline-block; width:99%;
+    display:inline-block !important; width:99%;
 	overflow-x:hidden; overflow-y:hidden; 
 	max-width:768px; min-width:766px;
 }

@@ -325,7 +325,7 @@ function resizeWindow(){
 			if(logoLink){
 				var clientRdi = parseInt(Math.random()*100000);
 				var currentHref = logoLink.href;
-				if(currentHref==null){ currentHref = new Object(); }
+				if(currentHref==null){ currentHref = ""; }
 				var currentHrefPos = currentHref.indexOf('clientRdi=');
 				if( currentHrefPos > -1){
 					currentHref = currentHref.substring(0, currentHrefPos);

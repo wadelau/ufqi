@@ -1,5 +1,70 @@
 //- relocate from finance-fund-chart.html, 09:27 2024-03-13
 
+//-define date.format
+Date.prototype.format = function (fmt) { //author: meizz
+  var o = {
+    "m+": this.getMonth() + 1,
+    "d+": this.getDate(),
+    "H+": this.getHours(),
+    "M+": this.getMinutes(),
+    "s+": this.getSeconds(),
+    "q+": Math.floor((this.getMonth() + 3) / 3), //quarter
+    "S": this.getMilliseconds()
+  };
+  if (/(Y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+  for (var k in o){
+	if (new RegExp("(" + k + ")").test(fmt)){
+		fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+	}
+  }
+  return fmt;
+};
+//- append marker for trade, 11:50 2022-11-27
+var appendMark = function(myItem, isWeekView){
+	var theItem = myItem;
+	var tmpDate = null; var tmpTime = 0; var tradeInfo = {}; 
+	var hasSold = false; var tmpTimeSell = 0;
+	var weekNo1=0, weekNo2=0, weekNo3=0, hasMark=0; 
+	for(var ti in $fundTradeList){
+		tradeInfo = $fundTradeList[ti];
+		if(typeof tradeInfo != 'undefined'){
+			if(typeof tradeInfo['hasMark'] != 'undefined'){ 
+				hasMark = tradeInfo['hasMark'];
+				if(hasMark > 1){ continue; }
+			}
+			else{ hasMark = 0; }
+			if(tradeInfo['sell_date'].indexOf('1000') > -1){ hasSold = false; }else{ hasSold = true; }
+			if(hasSold){ 
+				tmpDate = new Date(tradeInfo['sell_date']); 
+				tmpTimeSell = tmpDate.getTime(); tmpDate = new Date(tradeInfo['idate']);
+			}
+			else{ 
+				tmpDate = new Date(tradeInfo['idate']); tmpTimeSell = 0;
+			} 
+			tmpTime = tmpDate.getTime();
+			//console.log("appendMark: tmpDate:"+tmpDate+" tmpTime:"+tmpTime+"/theTime:"+theItem[0]+" timeZoneShift:"+timeZoneShift+" balance:"+(tmpTime-theItem[0])+". theItem:"+theItem);
+			if(theItem[0] == tmpTime+1000){ //- 1 second more, see timeZoneShift
+				theItem.push(1); hasMark++; //- buy-in
+			}
+			else if(theItem[0] == tmpTimeSell+1000){ //- 1 second more, see timeZoneShift
+				theItem.push(-1); hasMark++; //- sell-out
+			}
+			else if(isWeekView){
+				weekNo1 = getWeekNo(theItem[0]); weekNo2 = getWeekNo(tmpTime);
+				weekNo3 = getWeekNo(tmpTimeSell);
+				if(weekNo1[0] == weekNo2[0] && weekNo1[1] == weekNo2[1]){
+					theItem.push(1); hasMark++; //- buy-in
+				}
+				else if(weekNo1[0] == weekNo3[0] && weekNo1[1] == weekNo3[1]){
+					theItem.push(-1); hasMark++; //- sell-out
+				}
+			}
+			tradeInfo['hasMark'] = hasMark; $fundTradeList[ti] = tradeInfo; //- marked only once
+		}		
+	}
+	return theItem;
+};
+//-
 var getWeekNo = function(myDateStrOrMilliSecond){
 	var currentdate = new Date(myDateStrOrMilliSecond);
 	var oneJan = new Date(currentdate.getFullYear(),0,1);
@@ -21,7 +86,7 @@ function changePriceSwitch(itype){
 	return 0;
 }
 //- update buyin href, 21:18 2024-10-22
-function updtBuyIn(myCode, tacticDesc){
+function updtBuyIn(myCode, tacticDesc, hasChance){
 	var bUrl = $url + '&mod=financefund&act=buyin&buyicode='+myCode;
 	if(tacticDesc==null){ tacticDesc = _getElement('strategyTestTacticDesc').innerText; }
 	var descLen = tacticDesc.length; var klp = tacticDesc.substring(descLen-4, descLen);
@@ -37,10 +102,28 @@ function updtBuyIn(myCode, tacticDesc){
 		hld = tacticDesc.substring(holdPos+5, holdPos+7);
 	}
 	if(hld.indexOf('d') > -1){ hld = hld.replace('d', ''); }
-	bUrl = bUrl + '&hold='+hld;
-	buyInHref = _getElement('hrefbuyin'); buyInHref.href = bUrl;
+	bUrl = bUrl + '&hold='+hld; var buyInHref = _getElement('hrefbuyin');
+	if(!hasChance){
+		bUrl += "&hasChance=0";
+		bUrl = "javascript:checkBuyChance('"+bUrl+"');";
+		buyInHref.href = bUrl;
+		buyInHref.target = '_self';
+	}
+	else{
+		bUrl += "&hasChance=1";
+		buyInHref.href = bUrl;
+	}
 	return 0;
-}
+};
+//-
+var checkBuyChance = function(bUrl){
+	let ursp = confirm('❌不满足条件买入, 确认冒险继续吗?');
+	if(ursp){
+		//window.location.href = bUrl;
+		window.open(bUrl, '_blank');
+	}
+	return void(0);
+};
 
 //- added by xenxin@ufqi, 12:07 2022-09-17
 function drawTable(myData){
@@ -262,6 +345,40 @@ function makeAppendPrice(){
 	appendpriceUrl += '&appendprice=' + _getElement('appendprice').value;
 	window.location.href = appendpriceUrl;
 }
+//- report pearsonCC, 17:26 2024-12-21
+var reportPearsonCC = function(){
+	var result = '';
+	if(Math.round(finalPriceData.pearsonCC*10) != Math.round(finalPriceData.pearsonCCLast*10)){
+		const myUrl = $url+'&mod=financefund&act=updtpearsoncc&icode='+finalPriceData.icode+"&pearsoncc="+finalPriceData.pearsonCC;
+		result = fetchData(myUrl);
+		//console.log("\treportPearsonCC: "+finalPriceData.icode+" updt new:"+finalPriceData.pearsonCC+" old:"+finalPriceData.pearsonCCLast);
+	}
+	else{
+		//console.log("\t reportPearsonCC: "+finalPriceData.icode+" keep old. pearsonCC:"+finalPriceData.pearsonCC+" old:"+finalPriceData.pearsonCCLast);
+	}
+	return result;
+}
+
+//-
+//async function fetchData(myUrl) {
+var fetchData = async function(myUrl){
+	var data = '';
+	try {
+		const response = await fetch(myUrl);
+		if(!response.ok){
+			//- skip...
+			//throw new Error('fundChart fetchData: Network response was not ok ' + response.statusText+' url:'+myUrl);
+		}
+		data = await response.text();
+		// console.log(data);
+	} 
+	catch (error) {
+		//- skip...
+		//console.error('fundChart fetchData: There has been a problem with your fetch operation:', error);
+	};
+	return data;
+};
+			
 //-
 function makeSearch(){
 	var searType = _getElement('searchtype');
@@ -285,7 +402,8 @@ function makeSearch(){
 			}
 			//- temp
 			myUrl = $url + '&mod=financefund&act=fundChart&icode='+idVal;
-			window.location.href = myUrl;
+			//window.location.href = myUrl;
+			window.open(myUrl, '_blank');
 		}
 		else if(idVal.length() > 2){
 			var myUrl = $url;
@@ -304,7 +422,8 @@ function makeSearch(){
 			}
 			//- temp
 			myUrl = $url + '&mod=financefund&act=list&oppnskiname=contains&pnskiname='+idVal;
-			window.location.href = myUrl;
+			//window.location.href = myUrl;
+			window.open(myUrl, '_blank');
 		}
 		else{
 			//-
@@ -314,4 +433,4 @@ function makeSearch(){
 	else{
 		//-
 	}
-}
+};
